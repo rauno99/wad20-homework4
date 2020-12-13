@@ -99,8 +99,42 @@ jest.mock("axios", () => ({
 describe('Posts', () => {
 
     const wrapper = mount(Posts, {router, store, localVue});
+    const posts = wrapper.findAll(".post");
 
     it('1 == 1', function () {
         expect(true).toBe(true)
+    });
+
+    it('All rendered', () => {
+        expect(posts.length).toEqual(testData.length);
+    });
+
+    it('Media rendered', () => {
+        for(let i = 0; i < posts.length; i++){
+            let post = posts.at(i);
+            let postTest = testData[i];
+
+            if(postTest.media){
+                if(postTest.media.type === "video"){
+                    expect(post.find('.post-image').find('video').exists()).toBe(true);
+                }
+
+                if(postTest.media.type === "image"){
+                    expect(post.find('.post-image').find('image').exists()).toBe(true);
+                }
+            }
+            else{
+                expect(post.find('.post-image').exists()).toBe(false);
+            }
+        }
+    });
+
+    it('Timestamps are correct', () => {
+        for (let i = 0; i < posts.length; i++) {
+            let post = posts.at(i);
+            let postTest = testData[i];
+            let correct = moment(postTest.createTime).format('LLLL');
+            expect(post.find('.post-author').find('small').text()).toEqual(correct)
+        }
     });
 });
